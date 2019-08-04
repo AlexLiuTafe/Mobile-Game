@@ -28,6 +28,12 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Canvas _canvas;
     private Camera _cam;
     public Vector2 input = Vector2.zero;
+    [Header("Player")]
+    public GameObject _player;
+    public Vector2 _playerDir;
+    public float _speed = 4f;
+
+    
 
     #endregion
     #region Properties
@@ -54,7 +60,7 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             float angle = Vector2.Angle(input, Vector2.up);
             if (snapAxis == AxisOptions.Horizontal)
             {
-                if (angle <22.5f || angle >157.5f)
+                if (angle < 22.5f || angle > 157.5f)
                 {
                     return 0;
                 }
@@ -65,7 +71,7 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             }
             else if (snapAxis == AxisOptions.Vertical)
             {
-                if(angle >67.5f || angle <112.5f)
+                if (angle > 67.5f || angle < 112.5f)
                 {
                     return 0;
                 }
@@ -73,11 +79,11 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             }
             else
             {
-                if(value >0)
+                if (value > 0)
                 {
                     return 1;
                 }
-                if(value <0)
+                if (value < 0)
                 {
                     return -1;
                 }
@@ -114,11 +120,15 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     #region Functions
     protected virtual void Start()
     {
+
+        _player = GameObject.FindGameObjectWithTag("Player");
+        Rigidbody2D _playerRigid= _player.GetComponent<Rigidbody2D>();
+        _playerDir = _playerRigid.velocity;
         HandleRange = _handlerRange;
         DeadZone = _deadZone;
         _baseRect = GetComponent<RectTransform>();
         _canvas = GetComponentInParent<Canvas>();
-        if(_canvas == null)
+        if (_canvas == null)
         {
             Debug.Log("This script goes on a child in the canvas...NOT ON THE CANVAS");
         }
@@ -127,17 +137,21 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         _handle.anchorMin = center;
         _handle.anchorMax = center;
         _handle.pivot = center;
-        _handle.anchoredPosition = Vector2.zero;    
+        _handle.anchoredPosition = Vector2.zero;
+        
     }
+   
     void FormatInput()
     {
         if (_axisOptions == AxisOptions.Horizontal)
         {
             input = new Vector2(input.x, 0);
+            
         }
         else if (_axisOptions == AxisOptions.Vertical)
         {
             input = new Vector2(0, input.y);
+            
         }
 
 
@@ -149,6 +163,7 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             if (magnitude > 1)
             {
                 input = normalised;
+               
             }
         }
         else
@@ -161,12 +176,13 @@ public class JoyStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         Vector2 localPoint = Vector2.zero;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(_baseRect, screenPosition, _cam, out localPoint))
         {
+
             return localPoint - (_background.anchorMax * _baseRect.sizeDelta);
         }
 
         return Vector2.zero;
     }
-
+    
     #endregion
     #region Interface
     public void OnDrag(PointerEventData eventData)

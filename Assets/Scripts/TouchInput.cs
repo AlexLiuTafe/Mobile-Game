@@ -15,7 +15,7 @@ public class TouchInput : MonoBehaviour
 
     private void Start()
     {
-        playerPos = Player.transform.position;
+       
 
     }
     private void Update()
